@@ -172,7 +172,7 @@ const Volunteer = () => {
                     name="phone"
                     value={formData.phone}
                     onChange={handleChange}
-                    placeholder="+91 XXXXX XXXXX"
+                    placeholder="+91 70195 46246"
                     required
                     className="h-12"
                   />

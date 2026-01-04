@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/ui/Section";
 import { toast } from "@/hooks/use-toast";
+import qrcode from "@/assets/qrcode.png";
 
 const bankDetails = {
   accountName: "PALLI VIKASH PODANGI",
@@ -142,7 +143,8 @@ const Donate = () => {
               {/* QR Code Placeholder */}
               <div className="bg-muted rounded-xl p-8 flex flex-col items-center justify-center">
                 <div className="w-48 h-48 bg-card rounded-lg flex items-center justify-center border-2 border-dashed border-border mb-4">
-                  <QrCode className="w-24 h-24 text-muted-foreground/50" />
+                  {/* <QrCode className="w-24 h-24 text-muted-foreground/50" /> */}
+                  <img src={qrcode} />
                 </div>
                 <p className="text-muted-foreground text-sm text-center">
                   Scan QR code with any UPI app

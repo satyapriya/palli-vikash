@@ -90,7 +90,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Phone</h3>
-                  <p className="text-muted-foreground text-sm">+91 XXXXX XXXXX</p>
+                  <p className="text-muted-foreground text-sm">+91 70195 46246</p>
                 </div>
               </div>
 
@@ -100,7 +100,7 @@ const Contact = () => {
                 </div>
                 <div>
                   <h3 className="font-semibold text-foreground mb-1">Email</h3>
-                  <p className="text-muted-foreground text-sm">contact@pallivikash.org</p>
+                  <p className="text-muted-foreground text-sm">pallivikashp@gmail.com</p>
                 </div>
               </div>
 
@@ -180,7 +180,7 @@ const Contact = () => {
                       name="phone"
                       value={formData.phone}
                       onChange={handleChange}
-                      placeholder="+91 XXXXX XXXXX"
+                      placeholder="+91 70195 46246"
                       className="h-12"
                     />
                   </div>
