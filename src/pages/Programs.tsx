@@ -244,11 +244,11 @@ const Programs = () => {
                 Donate Now
               </Button>
             </Link>
-            <Link to="/volunteer">
+            {/* <Link to="/volunteer">
               <Button variant="hero" size="lg" className="border-secondary-foreground/30 text-secondary-foreground hover:bg-secondary-foreground/10">
                 Become a Volunteer
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </Section>

@@ -185,12 +185,12 @@ const Impact = () => {
                 Donate Now
               </Button>
             </Link>
-            <Link to="/volunteer">
+            {/* <Link to="/volunteer">
               <Button variant="hero" size="lg">
                 Volunteer With Us
                 <ChevronRight className="w-5 h-5" />
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </Section>

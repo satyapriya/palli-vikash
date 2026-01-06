@@ -235,12 +235,12 @@ const Home = () => {
                 Donate Now
               </Button>
             </Link>
-            <Link to="/volunteer">
+            {/* <Link to="/volunteer">
               <Button variant="hero" size="xl">
                 <Users className="w-5 h-5" />
                 Volunteer With Us
               </Button>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </section>

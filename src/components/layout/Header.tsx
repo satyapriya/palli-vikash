@@ -47,7 +47,7 @@ const Header = () => {
               <h1 className="font-heading font-bold text-lg text-foreground leading-tight">
                 PALLI VIKASH
               </h1>
-              <p className="text-xs text-muted-foreground tracking-wider">
+              <p className="text-xs text-muted-foregroun tracking-wider">
                 Peace | Prosperity | Progress
               </p>
             </div>
@@ -62,7 +62,7 @@ const Header = () => {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === link.path
                     ? "text-primary bg-primary/10"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    : "text-muted-foregroun hover:text-foreground hover:bg-muted"
                 }`}
               >
                 {link.name}
@@ -72,11 +72,11 @@ const Header = () => {
 
           {/* CTA Buttons */}
           <div className="hidden lg:flex items-center gap-3">
-            <Link to="/volunteer">
+            {/* <Link to="/volunteer" className="hide">
               <Button variant="outline" size="sm">
                 Volunteer
               </Button>
-            </Link>
+            </Link> */}
             <Link to="/donate">
               <Button variant="donate" size="sm">
                 <Heart className="w-4 h-4" />
@@ -119,11 +119,11 @@ const Header = () => {
               </Link>
             ))}
             <div className="flex gap-3 mt-4 pt-4 border-t border-border">
-              <Link to="/volunteer" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
+              {/* <Link to="/volunteer" className="hide flex-1" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="outline" className="w-full">
                   Volunteer
                 </Button>
-              </Link>
+              </Link> */}
               <Link to="/donate" className="flex-1" onClick={() => setIsMobileMenuOpen(false)}>
                 <Button variant="donate" className="w-full">
                   <Heart className="w-4 h-4" />
