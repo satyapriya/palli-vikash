@@ -22,3 +22,41 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+.env
+
+# Package lockfiles (if using multiple managers)
+bun.lockb
+yarn.lock
+pnpm-lock.yaml
+**/package-lock.json
+
+# Vite
+.vite
+vite.config.ts.*
+
+# Firebase
+.firebase
+firebase-debug.log
+firebase-debug.*.log
+
+# Firebase Functions
+functions/lib
+functions/dist
+functions/node_modules
+functions/.env*
+functions/firebase-debug.log
+functions/firebase-debug.*.log
+
+# Testing
+coverage
+.nyc_output
+*.lcov
+
+# OS
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

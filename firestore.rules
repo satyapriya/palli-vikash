@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Donations/Payments readable by admins, writable via functions
+    match /payments/{doc} {
+      allow read: if request.auth != null;
+      allow write: if false; // Only functions/webhooks
+    }
+    match /donations/{doc} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null; // Fallback client writes
+    }
+  }
+}

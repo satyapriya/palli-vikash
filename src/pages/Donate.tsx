@@ -1,6 +1,7 @@
-import { useState } from "react";
-import { Heart, Copy, Check, QrCode, Building2, Smartphone } from "lucide-react";
+import React, { useState } from "react";
+import { Heart, Copy, Check, Building2, Smartphone, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { DonationForm } from "@/components/ui/DonationForm";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/ui/Section";
 import { toast } from "@/hooks/use-toast";
@@ -18,6 +19,7 @@ const upiId = "30389059516@sbi";
 
 const Donate = () => {
   const [copiedField, setCopiedField] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const copyToClipboard = (text: string, field: string) => {
     navigator.clipboard.writeText(text);
@@ -27,6 +29,82 @@ const Donate = () => {
       description: `${field} copied to clipboard`,
     });
     setTimeout(() => setCopiedField(null), 2000);
+  };
+
+  const handlePayment = async (formData: { amount: number; name: string; email: string }) => {
+    setIsLoading(true);
+    try {
+
+      // 1. Create order via Cloud Function
+      const orderRes = await fetch(`${import.meta.env.VITE_CLOUD_FUNCTIONS_BASE || ''}/createOrder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: formData.amount, name: formData.name, email: formData.email }),
+      });
+
+      const order = await orderRes.json();
+
+      if (!orderRes.ok) throw new Error(order.error || 'Order creation failed');
+
+      const options: any = {
+        key: import.meta.env.VITE_RAZORPAY_KEY || "rzp_test_xxxxx",
+        amount: order.amount,
+        currency: order.currency,
+        name: "Pallivikash NGO",
+        description: `Donation of ₹${formData.amount}`,
+        order_id: order.id,
+        prefill: {
+          name: formData.name,
+          email: formData.email,
+        },
+        theme: {
+          color: "#3399cc",
+        },
+        handler: async function (response: any) {
+          // 3. Verify payment via Cloud Function
+          const verifyRes = await fetch(`${import.meta.env.VITE_CLOUD_FUNCTIONS_BASE || ''}/verifyPayment`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              name: formData.name,
+              email: formData.email,
+              amount: formData.amount,
+            }),
+          });
+
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.success) {
+            toast({
+              title: "✅ Payment Successful!",
+              description: `Thank you ${formData.name}! Receipt saved. Payment ID: ${response.razorpay_payment_id.slice(-8)}`,
+            });
+          } else {
+            toast({
+              title: "⚠️ Payment Issue",
+              description: "Payment recorded but verification pending.",
+              variant: "destructive",
+            });
+          }
+        },
+      };
+
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+
+    } catch (err) {
+      console.error(err);
+      toast({
+        title: "❌ Payment Failed",
+        variant: "destructive",
+        description: "Please try again or use manual methods below.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -150,6 +228,24 @@ const Donate = () => {
                   Scan QR code with any UPI app
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Donation Form - NEW */}
+          <div className="bg-gradient-to-br from-muted to-background/50 rounded-3xl p-12 mb-16 shadow-2xl border border-border/50">
+            <div className="text-center mb-12">
+              <h2 className="font-heading text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent mb-4">
+                Support Our Mission
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Make a secure donation through Razorpay. 100% safe and encrypted.
+              </p>
+            </div>
+            <div className="max-w-md mx-auto">
+              <DonationForm 
+                onSubmit={handlePayment} 
+                loading={isLoading} 
+              />
             </div>
           </div>
 
