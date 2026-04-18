@@ -2,12 +2,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, HashRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import About from "./pages/About";
 import Programs from "./pages/Programs";
 import Impact from "./pages/Impact";
 import Donate from "./pages/Donate";
+import Login from "./pages/Login";
 import Volunteer from "./pages/Volunteer";
 import Gallery from "./pages/Gallery";
 import News from "./pages/News";
@@ -29,11 +30,12 @@ const App = () => (
           <Route path="/programs" element={<Programs />} />
           <Route path="/impact" element={<Impact />} />
           <Route path="/donate" element={<Donate />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/volunteer" element={<Volunteer />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/news" element={<News />} />
           <Route path="/contact" element={<Contact />} />
-          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>
@@ -42,3 +44,4 @@ const App = () => (
 );
 
 export default App;
+

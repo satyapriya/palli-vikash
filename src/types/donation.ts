@@ -4,11 +4,11 @@ export interface Donation {
   razorpayOrderId?: string;
   razorpaySignature?: string;
   amount: number;
-  currency: string;
+  currency?: string;
   donorName: string;
   donorEmail: string;
   timestamp: Date;
-  status: 'pending' | 'completed' | 'failed';
+  status: DonationStatus;
 }
 
 export type DonationStatus = 'pending' | 'completed' | 'failed';
