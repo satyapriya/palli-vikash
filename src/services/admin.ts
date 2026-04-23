@@ -13,8 +13,49 @@ const functions = getFunctions(app, "us-central1");
 // connectFunctionsEmulator(functions, 'localhost', 5001);
 
 export const makeAdmin = httpsCallable(functions, 'makeAdmin');
-export const removeAdmin = httpsCallable(functions, 'removeAdmin');
-export const listAdmins = httpsCallable(functions, 'listAdmins');
+export const removeAdmin = async (uid: string) => {
+  const auth = getAuth(app);
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not logged in');
+
+  const idToken = await user.getIdToken();
+  const response = await fetch('https://us-central1-palli-vikash.cloudfunctions.net/adminRemoveAdmin', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${idToken}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ uid }),
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
+
+  return response.json() as Promise<{ success: boolean; message: string }>;
+};
+export const listAdmins = async () => {
+  const auth = getAuth(app);
+  const user = auth.currentUser;
+  if (!user) throw new Error('Not logged in');
+
+  const idToken = await user.getIdToken();
+  const response = await fetch('https://adminlistadmins-4wkqfwlpja-uc.a.run.app', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${idToken}`,
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (!response.ok) {
+    const error = await response.text();
+    throw new Error(error);
+  }
+
+  return response.json() as Promise<{ admins: User[] }>;
+};
 
 
 
@@ -34,9 +75,10 @@ export const isCurrentUserAdmin = async (): Promise<boolean> => {
 
     console.log("✅ Token refreshed for:", user.uid);
 
-    const { data } = await listAdmins() as { data: { admins: User[] } };
+    const result = await listAdmins();
+    const data = result.admins || []; // Raw response from HTTP
 
-    return data.admins.some(admin => admin.uid === user.uid);
+    return data.some(admin => admin.uid === user.uid);
   } catch (err) {
     console.error("Admin check error:", err);
     return false;

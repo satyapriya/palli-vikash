@@ -227,76 +227,91 @@ exports.makeAdmin = functions.https.onCall(async (data, context) => {
 });
 
 // ========================
-  // ✅ LIST ADMINS (HTTP + CORS)
+  // ✅ ADMIN LIST (HTTP + CORS - NEW NAME)
   // ========================
- exports.listAdmins = functions.https.onCall(async (data, context) => {
-  try {
-    if (!context.auth) {
-      throw new Error("Not authenticated");
-    }
+exports.adminListAdmins = onRequest(async (req, res) => {
+    return cors(req, res, async () => {
+      try {
+        if (req.method !== "POST") {
+          return res.status(405).json({ error: "Method not allowed" });
+        }
 
-    const uid = context.auth.uid;
+        const idToken = req.headers.authorization?.replace("Bearer ", "");
+        if (!idToken) {
+          return res.status(401).json({ error: "No token" });
+        }
 
-    const callerDoc = await db.collection("users").doc(uid).get();
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const uid = decodedToken.uid;
+        const callerDoc = await db.collection("users").doc(uid).get();
 
-    if (!callerDoc.exists || !callerDoc.data().isAdmin) {
-      throw new Error("Admin only");
-    }
+        if (!callerDoc.exists || !callerDoc.data().isAdmin) {
+          return res.status(403).json({ error: "Admin only" });
+        }
 
-    const snapshot = await db
-      .collection("users")
-      .where("isAdmin", "==", true)
-      .get();
+        const snapshot = await db.collection("users")
+          .where("isAdmin", "==", true)
+          .get();
 
-    const admins = snapshot.docs.map(doc => ({
-      uid: doc.id,
-      ...doc.data()
-    }));
+        const admins = snapshot.docs.map(doc => ({
+          uid: doc.id,
+          ...doc.data()
+        }));
 
-    return { admins };
-  } catch (err) {
-    console.error("listAdmins error:", err);
-    throw new functions.https.HttpsError("internal", err.message);
-  }
-});
+        return res.json({ admins });
+      } catch (err) {
+        console.error("adminListAdmins error:", err);
+        return res.status(500).json({ error: err.message });
+      }
+    });
+  });
+
 
 
 // ========================
-  // ✅ REMOVE ADMIN (HTTP + CORS)
+  // ✅ ADMIN REMOVE (HTTP + CORS - NEW NAME)
   // ========================
- exports.removeAdmin = functions.https.onCall(async (data, context) => {
-  try {
-    if (!context.auth) {
-      throw new Error("Not authenticated");
-    }
+exports.adminRemoveAdmin = onRequest(async (req, res) => {
+    return cors(req, res, async () => {
+      try {
+        if (req.method !== "POST") {
+          return res.status(405).json({ error: "Method not allowed" });
+        }
 
-    const uid = context.auth.uid;
+        const idToken = req.headers.authorization?.replace("Bearer ", "");
+        if (!idToken) {
+          return res.status(401).json({ error: "No token" });
+        }
 
-    const callerDoc = await db.collection("users").doc(uid).get();
+        const decodedToken = await admin.auth().verifyIdToken(idToken);
+        const uid = decodedToken.uid;
+        const callerDoc = await db.collection("users").doc(uid).get();
 
-    if (!callerDoc.exists || !callerDoc.data().isAdmin) {
-      throw new Error("Admin only");
-    }
+        if (!callerDoc.exists || !callerDoc.data().isAdmin) {
+          return res.status(403).json({ error: "Admin only" });
+        }
 
-    const { uid: targetUid } = data;
+        const { uid: targetUid } = req.body;
+        if (!targetUid) {
+          return res.status(400).json({ error: "Missing uid" });
+        }
 
-    if (!targetUid) {
-      throw new Error("Missing uid");
-    }
+        await db.collection("users").doc(targetUid).set(
+          {
+            isAdmin: false,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          },
+          { merge: true }
+        );
 
-    await db.collection("users").doc(targetUid).set(
-      {
-        isAdmin: false,
-        updatedAt: admin.firestore.FieldValue.serverTimestamp()
-      },
-      { merge: true }
-    );
+        return res.json({ success: true, message: "Admin role removed" });
+      } catch (err) {
+        console.error("adminRemoveAdmin error:", err);
+        return res.status(500).json({ error: err.message });
+      }
+    });
+  });
 
-    return { success: true, message: "Admin role removed" };
-  } catch (err) {
-    throw new functions.https.HttpsError("internal", err.message);
-  }
-});
 
 
 
