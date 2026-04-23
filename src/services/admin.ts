@@ -1,6 +1,8 @@
 import { httpsCallable } from 'firebase/functions';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import { getApp } from 'firebase/app';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 import { User, AdminAction } from '@/types/user';
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
@@ -60,30 +62,48 @@ export const listAdmins = async () => {
 
 
 
-export const isCurrentUserAdmin = async (): Promise<boolean> => {
-  try {
-    const auth = getAuth(app);
+export const isCurrentUserAdmin = async (firestoreFirst = false): Promise<boolean> => {
+  const firebaseAuth = getAuth(app);
+  const firestoreDb = db;
+// Removed problematic listener - using component effect instead
+  console.log("🔥 isCurrentUserAdmin called");
+  const user = firebaseAuth.currentUser;
+  if (!user) {
+    console.log("❌ No user on check");
+    return false;
+  }
+  console.log("✅ User found:", user.uid, user.email);
 
-    const user = auth.currentUser;
-    if (!user) {
-      console.log("❌ No user");
-      return false;
+  try {
+    // 🔥 PRIORITY 1: Firestore check (supports manual isAdmin: true setup)
+    if (firestoreFirst) {
+      const userDocRef = doc(firestoreDb, 'users', user.uid);
+      const userDocSnap = await getDoc(userDocRef);
+      if (userDocSnap.exists()) {
+        const userData = userDocSnap.data() as any;
+        if (userData.isAdmin === true) {
+          console.log("✅ Firestore admin confirmed:", user.uid);
+          return true;
+        }
+      }
     }
 
-    // 🔥 FORCE TOKEN REFRESH (CRITICAL FIX)
+    // 🔥 PRIORITY 2: Token refresh + server check
     await user.getIdToken(true);
-
     console.log("✅ Token refreshed for:", user.uid);
 
     const result = await listAdmins();
-    const data = result.admins || []; // Raw response from HTTP
+    const data = result.admins || [];
 
-    return data.some(admin => admin.uid === user.uid);
+    const isServerAdmin = data.some(admin => admin.uid === user.uid);
+    console.log("✅ Server admin check:", isServerAdmin);
+    return isServerAdmin;
   } catch (err) {
     console.error("Admin check error:", err);
     return false;
   }
 };
+
 
 export const manageAdminRole = async (uid: string, action: AdminAction): Promise<{success: boolean; message: string}> => {
   let callable;

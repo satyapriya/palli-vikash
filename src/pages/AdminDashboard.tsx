@@ -8,7 +8,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getDonations, getAdminStats } from '@/services/donations';
 import { makeAdmin, removeAdmin, listAdmins, isCurrentUserAdmin } from '@/services/admin';
 import { db, auth } from '@/lib/firebase';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
+import { Home, LogOut } from 'lucide-react';
 import { User } from '@/types/user';
 import { Donation } from '@/types/donation';
 import { formatDate, getStatusColor } from '@/lib/utils';
@@ -31,16 +33,24 @@ const AdminDashboard = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    checkAdminStatus();
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('Dashboard auth state:', user?.uid || 'no user');
+      if (user) {
+        checkAdminStatus();
+      } else {
+        navigate('/login');
+      }
+    });
+    return unsubscribe;
   }, []);
 
   const checkAdminStatus = async () => {
     try {
       setLoading(true);
-      const admin = await isCurrentUserAdmin();
+      const admin = await isCurrentUserAdmin(true); // Firestore-first
       setIsAdmin(admin);
       if (!admin) {
-        toast({ title: 'Access Denied', description: 'Admin login required', variant: 'destructive' });
+        toast({ title: 'Access Denied', description: 'Admin login required (set users/{uid}/isAdmin=true)', variant: 'destructive' });
         navigate('/donate', { replace: true });
         return;
       }
@@ -93,7 +103,17 @@ const AdminDashboard = () => {
     }
   };
 
-  const toggleAdmin = async (uid: string, currentIsAdmin: boolean) => {
+const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      toast({ title: 'Logged out' });
+      navigate('/');
+    } catch (error) {
+      toast({ title: 'Logout failed', variant: 'destructive' });
+    }
+  };
+
+const toggleAdmin = async (uid: string, currentIsAdmin: boolean) => {
     try {
       const action = currentIsAdmin ? removeAdmin : makeAdmin;
       const { success, message } = await action({ uid });
@@ -121,12 +141,18 @@ const AdminDashboard = () => {
           <h1 className="text-4xl font-bold tracking-tight">Admin Dashboard</h1>
           <p className="text-muted-foreground mt-2">Analytics • Donations • User Management</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
+          <Button variant="outline" onClick={() => navigate('/')}>
+            <Home className="mr-2 h-4 w-4" />
+          </Button>
           <Button onClick={loadStats} disabled={statsLoading} variant="outline">
             {statsLoading ? 'Loading...' : 'Refresh Stats'}
           </Button>
           <Button onClick={loadDonations} disabled={donationsLoading} variant="outline">
             Refresh Donations
+          </Button>
+          <Button variant="destructive" onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
           </Button>
         </div>
       </div>
@@ -159,110 +185,52 @@ const AdminDashboard = () => {
         </Card>
       </div>
 
-      {/* Tabs: Donations & Admin Management */}
-      <Tabs defaultValue="donations" className="w-full">
-        <TabsList>
-          <TabsTrigger value="donations">Recent Donations</TabsTrigger>
-          <TabsTrigger value="admins">Admin Management ({admins.length})</TabsTrigger>
-        </TabsList>
-        <TabsContent value="donations" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Transactions (Limited to 50)</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Donor</TableHead>
-                    <TableHead>Amount</TableHead>
-                    <TableHead>Date</TableHead>
-                    <TableHead>ID</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {donations.map((donation) => (
-                    <TableRow key={donation.id}>
-                      <TableCell className="font-medium">
-                        {donation.donorName}
-                        <p className="text-sm text-muted-foreground">{donation.donorEmail}</p>
-                      </TableCell>
-                      <TableCell>₹{donation.amount.toLocaleString()}</TableCell>
-                      <TableCell>{formatDate(donation.timestamp)}</TableCell>
-                      <TableCell className="font-mono text-xs">
-                        {donation.razorpayPaymentId.slice(-8)}
-                      </TableCell>
-                      <TableCell>
-                        <Badge className={getStatusColor(donation.status)} variant="outline">
-                          {donation.status.toUpperCase()}
-                        </Badge>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {donations.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
-                        No recent donations. Test via /donate!
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        <TabsContent value="admins" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Admin Users ({admins.length}/{users.length})</CardTitle>
-              <CardDescription>Manage admin roles for authorized users</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>User ID</TableHead>
-                    <TableHead>Email</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {users.map((user) => (
-                    <TableRow key={user.uid}>
-                      <TableCell className="font-mono text-sm">{user.uid.slice(0, 8)}...</TableCell>
-                      <TableCell>{user.email}</TableCell>
-                      <TableCell>
-                        <Badge variant={user.isAdmin ? 'default' : 'secondary'}>
-                          {user.isAdmin ? 'Admin' : 'User'}
-                        </Badge>
-                      </TableCell>
-                      <TableCell>
-                        <Button 
-                          size="sm" 
-                          variant="outline"
-                          onClick={() => toggleAdmin(user.uid, user.isAdmin)}
-                          disabled={user.uid === auth.currentUser?.uid}
-                        >
-                          {user.isAdmin ? 'Remove Admin' : 'Make Admin'}
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {users.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={4} className="h-24 text-center">
-                        No users yet. Donations will create user docs.
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+      {/* Donations only - Admin Management hidden */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Recent Transactions (Limited to 50)</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Donor</TableHead>
+                <TableHead>Amount</TableHead>
+                <TableHead>Date</TableHead>
+                <TableHead>ID</TableHead>
+                <TableHead>Status</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {donations.map((donation) => (
+                <TableRow key={donation.id}>
+                  <TableCell className="font-medium">
+                    {donation.donorName}
+                    <p className="text-sm text-muted-foreground">{donation.donorEmail}</p>
+                  </TableCell>
+                  <TableCell>₹{donation.amount.toLocaleString()}</TableCell>
+                  <TableCell>{formatDate(donation.timestamp)}</TableCell>
+                  <TableCell className="font-mono text-xs">
+                    {donation.razorpayPaymentId.slice(-8)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge className={getStatusColor(donation.status)} variant="outline">
+                      {donation.status.toUpperCase()}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+              {donations.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                    No recent donations. Test via /donate!
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
     </div>
   );
 };
