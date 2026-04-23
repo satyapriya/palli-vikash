@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { X, ChevronLeft, ChevronRight, Plus, Loader2, Trash2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as GalleryService from "@/services/gallery";
+import { isCurrentUserAdmin } from "@/services/admin";
 import { GalleryImage } from "@/types/gallery";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/ui/Section";
@@ -45,6 +46,8 @@ import {
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod";
+import { onAuthStateChanged } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 
 
@@ -58,13 +61,41 @@ const formSchema = z.object({
 type FormData = z.infer<typeof formSchema>;
 
 const Gallery = () => {
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdminLoading, setIsAdminLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [open, setOpen] = useState(false);
   const [currentImageId, setCurrentImageId] = useState("");
+  const [comboboxOpen, setComboboxOpen] = useState(false);
+  const [categoryValue, setCategoryValue] = useState("");
   const queryClient = useQueryClient();
 
+  // useEffect(() => {
+  //   const check = async () => {
+  //     const status = await isCurrentUserAdmin(true);
+  //     console.log('Gallery admin check:', status);
+  //     setIsAdmin(status);
+  //     setIsAdminLoading(false);
+  //   };
+  //   check();
+  // }, []); 
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const status = await isCurrentUserAdmin(true);
+        console.log("Gallery admin check:", status);
+        setIsAdmin(status);
+      } else {
+        setIsAdmin(false);
+      }
+      setIsAdminLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const categoriesQuery = useQuery({
     queryKey: ['categories'],
@@ -126,8 +157,6 @@ const Gallery = () => {
     },
   });
 
-  const [comboboxOpen, setComboboxOpen] = useState(false);
-  const [categoryValue, setCategoryValue] = useState(""); 
 
   const openLightbox = (index: number) => {
     const image = filteredImages[index];
@@ -176,156 +205,158 @@ const Gallery = () => {
           description="Browse through photos from our health camps, education programs, women empowerment initiatives, and more."
         />
 
-        <div className="flex justify-end mb-8">
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Add New Image
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-2xl">
-              <DialogHeader>
-                <DialogTitle>Add New Gallery Image</DialogTitle>
-                <DialogDescription>
-                  Fill in the details and upload an image. Image will be uploaded to Cloudinary and saved to Firebase.
-                </DialogDescription>
-              </DialogHeader>
-              <Form {...form}>
-                <form onSubmit={form.handleSubmit((data) => addMutation.mutate(data))} className="space-y-4">
-                  <FormField
-                    control={form.control}
-                    name="title"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Title</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Enter image title" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Description</FormLabel>
-                        <FormControl>
-                          <Textarea placeholder="Enter image description" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="category"
-                    render={({ field }) => (
-                      <FormItem className="flex flex-col">
-                        <FormLabel>Category</FormLabel>
-                        <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
-                          <PopoverTrigger asChild>
-                            <Button
-                              variant="outline"
-                              role="combobox"
-                              className="w-full justify-between capitalize"
-                              onClick={() => form.trigger("category")}
-                            >
-                              {form.watch("category") || categoryValue
-                                ? categoriesQuery.data?.includes(form.watch("category") || categoryValue)
-                                  ? form.watch("category") || categoryValue
-                                  : `+ Create "${categoryValue}"`
-                                : "Select or create category..."}
-                            </Button>
-                          </PopoverTrigger>
-                          <PopoverContent className="w-[300px] p-0 max-h-96 overflow-y-auto">
-                            <Command>
-                              <CommandInput placeholder="Search category..." onValueChange={setCategoryValue} />
-                              {categoriesQuery.data?.some((category) => category.toLowerCase().includes(categoryValue.toLowerCase())) || !categoryValue ? (
-                                <>
-                                  <CommandEmpty>No category found.</CommandEmpty>
-                                  <CommandGroup>
-                                    {categoriesQuery.data?.map((category) => (
+        {(!isAdminLoading && isAdmin) && (
+          <div className="flex justify-end mb-8">
+            <Dialog open={open} onOpenChange={setOpen}> 
+              <DialogTrigger asChild>
+                <Button>
+                  <Plus className="w-4 h-4 mr-2" />
+                  Add New Image
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Add New Gallery Image</DialogTitle>
+                  <DialogDescription>
+                    Fill in the details and upload an image. Image will be uploaded to Cloudinary and saved to Firebase.
+                  </DialogDescription>
+                </DialogHeader>
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit((data) => addMutation.mutate(data))} className="space-y-4">
+                    <FormField
+                      control={form.control}
+                      name="title"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Title</FormLabel>
+                          <FormControl>
+                            <Input placeholder="Enter image title" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="description"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Description</FormLabel>
+                          <FormControl>
+                            <Textarea placeholder="Enter image description" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <FormField
+                      control={form.control}
+                      name="category"
+                      render={({ field }) => (
+                        <FormItem className="flex flex-col">
+                          <FormLabel>Category</FormLabel>
+                          <Popover open={comboboxOpen} onOpenChange={setComboboxOpen}>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant="outline"
+                                role="combobox"
+                                className="w-full justify-between capitalize"
+                                onClick={() => form.trigger("category")}
+                              >
+                                {form.watch("category") || categoryValue
+                                  ? categoriesQuery.data?.includes(form.watch("category") || categoryValue)
+                                    ? form.watch("category") || categoryValue
+                                    : `+ Create "${categoryValue}"`
+                                  : "Select or create category..."}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-[300px] p-0 max-h-96 overflow-y-auto">
+                              <Command>
+                                <CommandInput placeholder="Search category..." onValueChange={setCategoryValue} />
+                                {categoriesQuery.data?.some((category) => category.toLowerCase().includes(categoryValue.toLowerCase())) || !categoryValue ? (
+                                  <>
+                                    <CommandEmpty>No category found.</CommandEmpty>
+                                    <CommandGroup>
+                                      {categoriesQuery.data?.map((category) => (
+                                        <CommandItem
+                                          key={category}
+                                          value={category}
+                                          onSelect={() => {
+                                            form.setValue("category", category);
+                                            setCategoryValue(category);
+                                            form.trigger("category");
+                                            setComboboxOpen(false);
+                                          }}
+                                        >
+                                          {category}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </>
+                                ) : (
+                                  <>
+                                    <CommandEmpty>No category found.</CommandEmpty>
+                                    <CommandGroup>
                                       <CommandItem
-                                        key={category}
-                                        value={category}
-                                        onSelect={() => {
-                                          form.setValue("category", category);
-                                          setCategoryValue(category);
+                                        onSelect={async () => {
+                                          await createCategoryMutation.mutateAsync(categoryValue);
+                                          form.setValue("category", categoryValue);
                                           form.trigger("category");
                                           setComboboxOpen(false);
                                         }}
                                       >
-                                        {category}
+                                        Create "{categoryValue}"
                                       </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </>
-                              ) : (
-                                <>
-                                  <CommandEmpty>No category found.</CommandEmpty>
-                                  <CommandGroup>
-                                    <CommandItem
-                                      onSelect={async () => {
-                                        await createCategoryMutation.mutateAsync(categoryValue);
-                                        form.setValue("category", categoryValue);
-                                        form.trigger("category");
-                                        setComboboxOpen(false);
-                                      }}
-                                    >
-                                      Create "{categoryValue}"
-                                    </CommandItem>
-                                  </CommandGroup>
-                                </>
-                              )}
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="imageFile"
-                    render={() => (
-                      <FormItem>
-                        <FormLabel>Image</FormLabel>
-                        <FormControl>
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => {
-                              const file = e.target.files?.[0];
-                              if (file) {
-                                form.setValue("imageFile", file, { shouldValidate: true });
-                              }
-                            }}
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter>
-                    <Button type="submit" disabled={addMutation.isPending || !form.formState.isValid}>
-                      {addMutation.isPending ? (
-                        <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                          Uploading...
-                        </>
-                      ) : (
-                        'Save Image'
+                                    </CommandGroup>
+                                  </>
+                                )}
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
+                          <FormMessage />
+                        </FormItem>
                       )}
-                    </Button>
-                  </DialogFooter>
-                </form>
-              </Form>
-            </DialogContent>
-          </Dialog>
-        </div>
+                    />
+                    <FormField
+                      control={form.control}
+                      name="imageFile"
+                      render={() => (
+                        <FormItem>
+                          <FormLabel>Image</FormLabel>
+                          <FormControl>
+                            <Input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (file) {
+                                  form.setValue("imageFile", file, { shouldValidate: true });
+                                }
+                              }}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                    <DialogFooter>
+                      <Button type="submit" disabled={addMutation.isPending || !form.formState.isValid}>
+                        {addMutation.isPending ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Uploading...
+                          </>
+                        ) : (
+                          'Save Image'
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </Form>
+              </DialogContent>
+            </Dialog>
+          </div>
+        )}
 
         {/* Category Filter */}
         <div className="flex flex-wrap justify-center gap-3 mb-12">
@@ -395,10 +426,10 @@ const Gallery = () => {
             className="absolute right-4 p-2 text-card hover:text-card/80 transition-colors"
             aria-label="Next image"
           >
-            <ChevronRight className="w-8 h-8" />
+            <ChevronRight className="w-8 h-4" />
           </button>
 
-          <button
+          {!isAdminLoading && isAdmin && <button
             onClick={async () => {
               if (confirm('Are you sure you want to delete this image? This action cannot be undone.')) {
                 deleteMutation.mutate(currentImageId);
@@ -413,7 +444,7 @@ const Gallery = () => {
             ) : (
               <Trash2 className="w-5 h-5" />
             )}
-          </button>
+          </button>}
 
           <img
             src={filteredImages[currentImageIndex]?.imageUrl}
@@ -435,3 +466,4 @@ const Gallery = () => {
 };
 
 export default Gallery;
+
