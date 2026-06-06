@@ -45,10 +45,10 @@ const focusAreas = [
 ];
 
 const impactStats = [
-  { value: 10, suffix: "+", label: "Years of Service" },
-  { value: 50, suffix: "+", label: "Villages Reached" },
+  { value: 25, suffix: "+", label: "Years of Service" },
+  { value: 320, suffix: "+", label: "Villages Reached" },
   { value: 5000, suffix: "+", label: "Families Supported" },
-  { value: 100, suffix: "+", label: "Programs Conducted" },
+  { value: 1000, suffix: "+", label: "Programs Conducted" },
 ];
 
 const Home = () => {

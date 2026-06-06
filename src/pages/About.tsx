@@ -30,10 +30,10 @@ const values = [
 ];
 
 const milestones = [
-  { year: "2014", title: "Foundation", description: "PALLI VIKASH was established in Podangi village with a vision for rural development." },
-  { year: "2015", title: "First Health Camp", description: "Organized our first free medical camp serving over 500 villagers." },
-  { year: "2017", title: "Women SHGs", description: "Established 10 Self-Help Groups empowering rural women economically." },
-  { year: "2018", title: "Education Initiative", description: "Started evening tuition centers benefiting 200+ children." },
+  { year: "2000", title: "Foundation", description: "PALLI VIKASH was established in Podangi village with a vision for rural development." },
+  { year: "2002", title: "First Health Camp", description: "Organized our first free medical camp serving over 500 villagers." },
+  { year: "2004", title: "Women SHGs", description: "Established 10 Self-Help Groups empowering rural women economically." },
+  { year: "2006", title: "Education Initiative", description: "Started evening tuition centers benefiting 200+ children." },
   { year: "2020", title: "COVID-19 Relief", description: "Distributed food and essentials to 1000+ families during the pandemic." },
   { year: "2022", title: "Environment Drive", description: "Planted 5000+ trees across 15 villages in collaboration with community." },
   { year: "2024", title: "Expansion", description: "Extended our reach to 50+ villages across Ganjam district." },
@@ -67,7 +67,7 @@ const About = () => {
               Who We Are
             </h2>
             <p className="text-muted-foreground text-lg leading-relaxed mb-6">
-              PALLI VIKASH, meaning "Village Development" in Odia, is a registered non-governmental organization based in Ganjam district, Odisha. Since our inception in 2014, we have been dedicated to the holistic development of rural communities.
+              PALLI VIKASH is a registered NGO headquartered in Ganjam, Odisha, with a presence across India. Since 2000, we have been dedicated to empowering rural communities through education, healthcare, women’s empowerment, and sustainable development initiatives. Our mission is to create lasting positive change and improve lives with dignity, hope, and opportunity.
             </p>
             <p className="text-muted-foreground leading-relaxed mb-6">
               We believe that true progress happens when communities are empowered to lead their own development. Our programs are designed in collaboration with the people we serve, ensuring relevance and sustainability.
