@@ -31,11 +31,11 @@ const values = [
 
 const milestones = [
   { year: "2000", title: "Foundation", description: "PALLI VIKASH was established in Podangi village with a vision for rural development." },
-  { year: "2002", title: "First Health Camp", description: "Organized our first free medical camp serving over 500 villagers." },
-  { year: "2004", title: "Women SHGs", description: "Established 10 Self-Help Groups empowering rural women economically." },
-  { year: "2006", title: "Education Initiative", description: "Started evening tuition centers benefiting 200+ children." },
-  { year: "2020", title: "COVID-19 Relief", description: "Distributed food and essentials to 1000+ families during the pandemic." },
-  { year: "2022", title: "Environment Drive", description: "Planted 5000+ trees across 15 villages in collaboration with community." },
+  { year: "2004", title: "First Health Camp", description: "Organized our first free medical camp serving over 500 villagers." },
+  { year: "2008", title: "Women SHGs", description: "Established 10 Self-Help Groups empowering rural women economically." },
+  { year: "2012", title: "Education Initiative", description: "Started evening tuition centers benefiting 200+ children." },
+  { year: "2016", title: "COVID-19 Relief", description: "Distributed food and essentials to 1000+ families during the pandemic." },
+  { year: "2020", title: "Environment Drive", description: "Planted 5000+ trees across 15 villages in collaboration with community." },
   { year: "2024", title: "Expansion", description: "Extended our reach to 50+ villages across Ganjam district." },
 ];
 
@@ -83,7 +83,7 @@ const About = () => {
               className="rounded-2xl shadow-elevated w-full"
             />
             <div className="absolute -bottom-6 -left-6 bg-secondary text-secondary-foreground p-6 rounded-xl shadow-card">
-              <div className="font-heading text-4xl font-bold">10+</div>
+              <div className="font-heading text-4xl font-bold">26+</div>
               <div className="text-sm">Years of Service</div>
             </div>
           </div>

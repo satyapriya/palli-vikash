@@ -5,7 +5,7 @@ import Layout from "@/components/layout/Layout";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 import Counter from "@/components/ui/Counter";
-import heroImage from "@/assets/hero-community.jpg";
+import heroVideo from "@/assets/palli-banner.mp4";
 import womenImage from "@/assets/women-empowerment.jpg";
 import educationImage from "@/assets/education-children.jpg";
 import healthImage from "@/assets/health-camp.jpg";
@@ -46,9 +46,9 @@ const focusAreas = [
 
 const impactStats = [
   { value: 25, suffix: "+", label: "Years of Service" },
-  { value: 320, suffix: "+", label: "Villages Reached" },
-  { value: 5000, suffix: "+", label: "Families Supported" },
-  { value: 1000, suffix: "+", label: "Programs Conducted" },
+  { value: 264, suffix: "+", label: "Villages Reached" },
+  { value: 5072, suffix: "+", label: "Families Supported" },
+  { value: 495, suffix: "+", label: "Programs Conducted" },
 ];
 
 const Home = () => {
@@ -58,12 +58,15 @@ const Home = () => {
       <section className="relative min-h-screen flex items-center pt-20">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <img
-            src={heroImage}
-            alt="Rural community development"
+          <video
+            src={heroVideo}
+            autoPlay
+            muted
+            loop
+            playsInline
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/60" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/85 via-primary/60" />
         </div>
 
         {/* Content */}
