@@ -121,8 +121,9 @@ const Contact = () => {
             {/* Map Placeholder */}
             <div className="mt-8 bg-muted rounded-xl h-64 flex items-center justify-center">
               <div className="text-center">
-                <MapPin className="w-12 h-12 text-muted-foreground/50 mx-auto mb-2" />
-                <p className="text-muted-foreground text-sm">Map Integration</p>
+                {/* <MapPin className="w-12 h-12 text-muted-foreground/50 mx-auto mb-2" /> */}
+                {/* <p className="text-muted-foreground text-sm">Map Integration</p> */}
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2327.7506422374854!2d84.70780070856547!3d19.502050249317193!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a22b3482f27db39%3A0x9533bf138e7c91a7!2sPodingi%2C%20Odisha!5e0!3m2!1sen!2sin!4v1781422786235!5m2!1sen!2sin" width="350" height="250" loading="lazy"></iframe>
               </div>
             </div>
           </div>

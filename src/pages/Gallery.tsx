@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+
 import { X, ChevronLeft, ChevronRight, Plus, Loader2, Trash2 } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import * as GalleryService from "@/services/gallery";
@@ -10,6 +11,8 @@ import SectionHeader from "@/components/ui/SectionHeader";
 import {
   Button
 } from "@/components/ui/button"
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion";
+
 import {
   Dialog,
   DialogContent,
@@ -66,10 +69,14 @@ const Gallery = () => {
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [lightboxImages, setLightboxImages] = useState<GalleryImage[]>([]);
+
   const [open, setOpen] = useState(false);
   const [currentImageId, setCurrentImageId] = useState("");
   const [comboboxOpen, setComboboxOpen] = useState(false);
   const [categoryValue, setCategoryValue] = useState("");
+  const [expandedCategories, setExpandedCategories] = useState<Record<string, boolean>>({});
+
   const queryClient = useQueryClient();
 
   // useEffect(() => {
@@ -158,26 +165,45 @@ const Gallery = () => {
   });
 
 
-  const openLightbox = (index: number) => {
-    const image = filteredImages[index];
-    if (image?.id) {
-      setCurrentImageId(image.id);
-    }
-    setCurrentImageIndex(index);
+  const openLightboxById = (imageId: string) => {
+    const image = allImages.find((img) => img.id === imageId);
+    if (!image) return;
+
+    // Lightbox should respect current category filter.
+    const lightboxSet = activeCategory === 'All'
+      ? allImages
+      : allImages.filter((img) => img.category === activeCategory);
+
+    const idx = lightboxSet.findIndex((img) => img.id === imageId);
+    if (idx < 0) return;
+
+    setLightboxImages(lightboxSet);
+    setCurrentImageId(image.id);
+    setCurrentImageIndex(idx);
     setLightboxOpen(true);
   };
 
+
   const closeLightbox = () => {
     setLightboxOpen(false);
+    setLightboxImages([]);
   };
 
+
   const nextImage = () => {
-    setCurrentImageIndex((prev) => (prev + 1) % filteredImages.length);
+    setCurrentImageIndex((prev) => {
+      if (lightboxImages.length === 0) return 0;
+      return (prev + 1) % lightboxImages.length;
+    });
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => (prev - 1 + filteredImages.length) % filteredImages.length);
+    setCurrentImageIndex((prev) => {
+      if (lightboxImages.length === 0) return 0;
+      return (prev - 1 + lightboxImages.length) % lightboxImages.length;
+    });
   };
+
 
   return (
     <Layout>
@@ -359,7 +385,7 @@ const Gallery = () => {
         )}
 
         {/* Category Filter */}
-        <div className="flex flex-wrap justify-center gap-3 mb-12">
+        {/* <div className="flex flex-wrap justify-center gap-3 mb-12">
           {['All', ...(categoriesQuery.data ?? [])].map((category) => (
             <Button
               key={category}
@@ -373,33 +399,119 @@ const Gallery = () => {
               {category}
             </Button>
           ))}
-        </div>
+        </div> */}
 
-        {/* Gallery Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {imagesQuery.isLoading ? (
-            <p className="col-span-full text-center py-8 text-muted-foreground">Loading images...</p>
-          ) : filteredImages.length === 0 ? (
-            <p className="col-span-full text-center py-8 text-muted-foreground">No images found. Add your first image!</p>
-          ) : (
-            filteredImages.map((image, index) => (
-              <div
-                key={image.id || index}
-                onClick={() => openLightbox(index)}
-                className="relative aspect-square rounded-xl overflow-hidden cursor-pointer group"
+        {/* Gallery grouped by category (accordion view) */}
+        {imagesQuery.isLoading ? (
+          <p className="text-center py-8 text-muted-foreground">Loading images...</p>
+        ) : filteredImages.length === 0 ? (
+          <p className="text-center py-8 text-muted-foreground">No images found. Add your first image!</p>
+        ) : (
+          (() => {
+            const groupImages: Record<string, GalleryImage[]> = {};
+            filteredImages.forEach((img) => {
+              const key = img.category;
+              if (!groupImages[key]) groupImages[key] = [];
+              groupImages[key].push(img);
+            });
+
+            const categoriesInView = Object.keys(groupImages);
+
+            const renderThumb = (image: GalleryImage) => (
+              <button
+                key={image.id}
+                type="button"
+                onClick={() => openLightboxById(image.id)}
+                className="relative flex-none aspect-[4/3] rounded-xl overflow-hidden cursor-pointer group"
+                aria-label={`Open image: ${image.title}`}
               >
                 <img
                   src={image.imageUrl}
                   alt={image.title}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                <div className="absolute inset-0 bg-gradient-to-t from-foreground/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-3">
                   <span className="text-card text-sm font-medium">{image.category}</span>
                 </div>
+                <span className="sr-only">{image.title}</span>
+              </button>
+            );
+
+            // Accordion components imported at top-level
+
+
+            return (
+              <div className="space-y-4">
+                {categoriesInView.map((category) => {
+                  const group = groupImages[category] ?? [];
+                  const expanded = true;
+                  const visible = expanded ? group : group.slice(0, 5);
+
+                  return (
+                    <Accordion
+
+                      type="single"
+                      collapsible
+                      key={category}
+                      value={expanded ? category : undefined}
+                      onValueChange={(val: string) => {
+                        setExpandedCategories((prev) => ({
+                          ...prev,
+                          [category]: val === category,
+                        }));
+                      }}
+                    >
+                      <AccordionItem value={category}>
+                        <AccordionTrigger className="px-2 acc-header">
+                          <span className="capitalize">{category}</span>
+                        </AccordionTrigger>
+                        <AccordionContent>
+                          <div className="w-full grid grid-cols-5 sm:grid-cols-5 md:grid-cols-5 gap-3 pb-3">
+                            {visible.map((img) => renderThumb(img))}
+                          </div>
+
+                          {group.length > 4 && !expanded && (
+                            <div className="flex justify-start">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setExpandedCategories((prev) => ({
+                                  ...prev,
+                                  [category]: true,
+                                }))}
+                                className="rounded-full px-4"
+                              >
+                                More
+                              </Button>
+                            </div>
+                          )}
+
+                          {group.length > 4 && expanded && (
+                            <div className="flex justify-start">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setExpandedCategories((prev) => ({
+                                  ...prev,
+                                  [category]: false,
+                                }))}
+                                className="rounded-full px-4"
+                              >
+                                Show Less
+                              </Button>
+                            </div>
+                          )}
+                        </AccordionContent>
+                      </AccordionItem>
+                    </Accordion>
+                  );
+                })}
               </div>
-            ))
-          )}
-        </div>
+            );
+          })()
+        )}
+
+
       </Section>
 
       {/* Lightbox */}
@@ -447,18 +559,19 @@ const Gallery = () => {
           </button>}
 
           <img
-            src={filteredImages[currentImageIndex]?.imageUrl}
-            alt={filteredImages[currentImageIndex]?.title}
+            src={lightboxImages[currentImageIndex]?.imageUrl}
+            alt={lightboxImages[currentImageIndex]?.title}
             className="max-w-full max-h-[80vh] rounded-lg"
           />
 
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-card text-center">
-            <p className="font-medium">{filteredImages[currentImageIndex]?.title}</p>
+            <p className="font-medium">{lightboxImages[currentImageIndex]?.title}</p>
             <p className="text-sm text-card/70">
-              {currentImageIndex + 1} / {filteredImages.length}
+              {currentImageIndex + 1} / {lightboxImages.length}
             </p>
-            <p className="text-xs text-card/50 mt-1">{filteredImages[currentImageIndex]?.category}</p>
+            <p className="text-xs text-card/50 mt-1">{lightboxImages[currentImageIndex]?.category}</p>
           </div>
+
         </div>
       )}
     </Layout>

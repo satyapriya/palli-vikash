@@ -11,8 +11,8 @@ import environmentImage from "@/assets/tree-plantation.jpg";
 const newsItems = [
   {
     id: 1,
-    title: "Free Eye Camp Successfully Conducted in Podangi Village",
-    excerpt: "Over 150 villagers received free eye check-ups and 50 were provided with spectacles during our recent eye camp.",
+    title: "Free Health Camp Successfully Conducted in Podangi Village",
+    excerpt: "Over 150 villagers received free health check-ups during our recent health camp, with many benefiting from medical consultations, screenings, and health awareness guidance.",
     date: "December 28, 2024",
     image: healthImage,
     category: "Healthcare",

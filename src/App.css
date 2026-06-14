@@ -40,3 +40,10 @@
 .read-the-docs {
   color: #888;
 }
+.acc-header {
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
