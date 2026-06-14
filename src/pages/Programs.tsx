@@ -18,10 +18,15 @@ import Layout from "@/components/layout/Layout";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
 import womenImage from "@/assets/women-empowerment.jpg";
+import ruralDevImage from "@/assets/rural-dev.jpg";
 import educationImage from "@/assets/education-children.jpg";
-import healthImage from "@/assets/health-camp.jpg";
+import healthImage from "@/assets/health-heygen.jpg";
 import environmentImage from "@/assets/tree-plantation.jpg";
-
+import womenWelfareImage from "@/assets/womenWelfare.jpg";
+import mentalHealthImage from "@/assets/mental-health.jpg";
+import disasterReliefImage from "@/assets/disaster-releaf.jpg";
+import cultureImage from "@/assets/culture.jpg";
+import employmentImage from "@/assets/skill-building.jpg";
 const programs = [
   {
     id: "community",
@@ -66,7 +71,7 @@ const programs = [
     id: "rural",
     icon: Users,
     title: "Rural Development",
-    image: womenImage,
+    image: ruralDevImage,
     description: "Infrastructure and sustainable development for rural transformation.",
     initiatives: [
       "Clean drinking water initiatives",
@@ -92,7 +97,7 @@ const programs = [
     id: "women",
     icon: HandHeart,
     title: "Women & Child Welfare",
-    image: womenImage,
+    image: womenWelfareImage,
     description: "Empowering women and protecting children for a brighter future.",
     initiatives: [
       "Women self-defense & empowerment programs",
@@ -105,7 +110,7 @@ const programs = [
     id: "mental",
     icon: Brain,
     title: "Mental Health & Disability Support",
-    image: healthImage,
+    image: mentalHealthImage,
     description: "Promoting mental wellness and inclusive support for all.",
     initiatives: [
       "Counseling & mental wellness programs",
@@ -118,7 +123,7 @@ const programs = [
     id: "disaster",
     icon: Umbrella,
     title: "Disaster Relief & Humanitarian Aid",
-    image: womenImage,
+    image: disasterReliefImage,
     description: "Rapid response and support during times of crisis.",
     initiatives: [
       "Flood & cyclone relief operations",
@@ -131,7 +136,7 @@ const programs = [
     id: "culture",
     icon: Palette,
     title: "Culture & Heritage",
-    image: educationImage,
+    image: cultureImage,
     description: "Preserving and promoting our rich cultural traditions.",
     initiatives: [
       "Promotion of traditional arts & crafts",
@@ -144,7 +149,7 @@ const programs = [
     id: "employment",
     icon: Briefcase,
     title: "Employment & Skill Building",
-    image: womenImage,
+    image: employmentImage,
     description: "Creating pathways to sustainable livelihoods and careers.",
     initiatives: [
       "Career guidance programs",

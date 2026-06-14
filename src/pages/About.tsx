@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import Section from "@/components/ui/Section";
 import SectionHeader from "@/components/ui/SectionHeader";
-import womenImage from "@/assets/women-empowerment.jpg";
+import outTeam from "@/assets/out-team.jpg";
 
 const values = [
   {
@@ -78,7 +78,7 @@ const About = () => {
           </div>
           <div className="relative">
             <img
-              src={womenImage}
+              src={outTeam}
               alt="Community meeting"
               className="rounded-2xl shadow-elevated w-full"
             />
@@ -144,7 +144,7 @@ const About = () => {
       <Section variant="muted">
         <SectionHeader
           subtitle="Our Journey"
-          title="10 Years of Progress"
+          title="26 Years of Progress"
           description="Key milestones that mark our journey of service and impact."
         />
 

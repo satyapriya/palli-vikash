@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Heart } from "lucide-react";
+import { Menu, X, Heart, Instagram, Facebook, Youtube, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logo from "@/assets/logo.png";
 
@@ -37,10 +37,10 @@ const Header = () => {
       }`}
     >
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-30">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-primary flex items-center justify-center">
+            <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center">
               <span className="text-primary-foreground font-heading font-bold text-xl"><img src={logo} /></span>
             </div>
             <div className="hidden sm:block">
@@ -62,7 +62,7 @@ const Header = () => {
                 className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
                   location.pathname === link.path
                     ? "text-primary bg-primary/10"
-                    : "text-muted-foregroun hover:text-foreground hover:bg-muted"
+                    : "text-muted-foregroun hover:text-foreground hover:bg-muted header-text-shadow"
                 }`}
               >
                 {link.name}
@@ -83,6 +83,46 @@ const Header = () => {
                 Donate Now
               </Button>
             </Link>
+
+            {/* Social links */}
+            <div className="flex items-center gap-2">
+              <a
+                href="https://www.instagram.com/pallivikash_podingi"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Instagram"
+                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+              >
+                <Instagram className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.facebook.com/share/18e9meNbtt/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="Facebook"
+                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+              >
+                <Facebook className="w-4 h-4" />
+              </a>
+              <a
+                href="https://aratt.ai/@palli_vikash_podangi"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="aratt.ai"
+                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+              >
+                <Globe className="w-4 h-4" />
+              </a>
+              <a
+                href="https://www.youtube.com/@PALLIVIKASHPATHAGARA/"
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label="YouTube"
+                className="w-9 h-9 rounded-full bg-primary/10 flex items-center justify-center hover:bg-primary/20 transition-colors"
+              >
+                <Youtube className="w-4 h-4" />
+              </a>
+            </div>
           </div>
 
           {/* Mobile Menu Button */}
@@ -130,6 +170,46 @@ const Header = () => {
                   Donate
                 </Button>
               </Link>
+
+              {/* Social links */}
+              <div className="flex items-center gap-2">
+                <a
+                  href="https://www.instagram.com/pallivikash_podingi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+                >
+                  <Instagram className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.facebook.com/share/18e9meNbtt/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Facebook"
+                  className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+                >
+                  <Facebook className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://aratt.ai/@palli_vikash_podangi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="aratt.ai"
+                  className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+                >
+                  <Globe className="w-4 h-4" />
+                </a>
+                <a
+                  href="https://www.youtube.com/@PALLIVIKASHPATHAGARA/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="w-9 h-9 rounded-full bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition-colors"
+                >
+                  <Youtube className="w-4 h-4" />
+                </a>
+              </div>
             </div>
           </nav>
         </div>

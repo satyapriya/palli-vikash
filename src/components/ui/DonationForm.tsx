@@ -12,12 +12,12 @@ interface DonationFormProps {
 
 export const DonationForm = ({ onSubmit, loading }: DonationFormProps) => {
   const [formData, setFormData] = useState({
-    amount: 500,
+    amount: 1000,
     name: '',
     email: '',
   });
 
-  const presets = [100, 500, 1000, 2500, 5000];
+  const presets = [1000, 5000, 10000, 25000, 50000];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

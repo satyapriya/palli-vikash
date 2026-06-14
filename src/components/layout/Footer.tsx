@@ -50,7 +50,7 @@ const Footer = () => {
                 </div>
               </div>
               <p className="text-primary-foreground/80 text-sm leading-relaxed">
-                A registered organization dedicated to rural development, community empowerment, and sustainable progress for over 10 years.
+                A registered organization dedicated to rural development, community empowerment, and sustainable progress for over 26 years.
               </p>
             </div>
 
