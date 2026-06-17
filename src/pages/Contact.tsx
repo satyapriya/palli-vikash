@@ -79,7 +79,7 @@ const Contact = () => {
                   <p className="text-muted-foreground text-sm leading-relaxed">
                     At / P.O.: Podangi, Via – Pitala<br />
                     District: Ganjam, Odisha<br />
-                    PIN: 761032
+                    PIN: 761103
                   </p>
                 </div>
               </div>

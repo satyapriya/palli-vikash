@@ -111,7 +111,7 @@ const Footer = () => {
                   <span className="text-primary-foreground/80 text-sm">
                     At / P.O.: Podangi, Via – Pitala<br />
                     District: Ganjam, Odisha<br />
-                    PIN: 761032
+                    PIN: 761103
                   </span>
                 </li>
                 <li className="flex items-center gap-3">

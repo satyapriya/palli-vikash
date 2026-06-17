@@ -195,8 +195,13 @@ const About = () => {
           <h2 className="font-heading text-3xl font-bold text-foreground mb-4">
             Registered & Recognized
           </h2>
-          <p className="text-muted-foreground text-lg mb-8">
-            PALLI VIKASH is a registered organization operating under the Societies Registration Act. We maintain complete transparency in our operations and finances, ensuring every contribution is utilized for maximum community impact.
+          <p className="text-muted-foreground text-lg mb-8 text-left leading-relaxed">
+            PALLI VIKASH is a registered non-governmental organization operating under the Societies Registration Act, 1860 (Act XXI of 1860).<br></br>
+            Registration Details:<br></br>
+            * GJM Registration No.: 6345-106 of 2001–2002<br></br>
+            * NGO DARPAN ID: OR/2025/0802735<br></br>
+            * CSR Registration (SRN): AC0944407<br></br>
+            We are committed to maintaining the highest standards of transparency, accountability, and integrity in all our operations and financial management. Every contribution received is utilized efficiently and responsibly to maximize positive impact and bring sustainable development to the communities we serve. Our focus remains on empowering rural communities through health, education, livelihood, and social welfare initiatives.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
             <Link to="/contact">
